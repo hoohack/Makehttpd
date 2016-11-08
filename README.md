@@ -16,3 +16,5 @@ Make a http server.Just for learning.
 6、增加404响应
 
 7、GET请求，文件存在时返回请求文件
+
+8、使用fork实现高并发的请求

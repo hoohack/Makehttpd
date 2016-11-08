@@ -416,7 +416,6 @@ int main()
 			close(client_fd);
 			exit(0);
 		} else {
-			/* 关闭客户端套接字 */
 			close(client_fd);
 		}
 	}
