@@ -389,6 +389,8 @@ int main()
 	socklen_t client_addr_len = sizeof(client_addr);
 	server_fd = startup();
 
+	pid_t pid;
+
 	while (1) {
 		/* 调用了accept函数，阻塞了进程，直到接收到客户端的请求 */
 		client_fd = accept(server_fd, (struct sockaddr *)&client_addr,
@@ -397,15 +399,27 @@ int main()
 			perror("accept");
 			exit(-1);
 		}
-		printf("client socket fd: %d\n", client_fd);
 
-		handle_request(client_fd);
+		pid = fork();
 
-		/* 关闭客户端套接字 */
-		close(client_fd);
+		if (pid < 0) {
+			perror("fork");
+			exit(-1);
+		}
+
+		if (pid == 0) {
+			close(server_fd);
+			printf("client socket fd: %d\n", client_fd);
+
+			handle_request(client_fd);
+
+			close(client_fd);
+			exit(0);
+		} else {
+			/* 关闭客户端套接字 */
+			close(client_fd);
+		}
 	}
-
-	close(server_fd);
 
 	return 0;
 }
