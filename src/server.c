@@ -45,6 +45,17 @@ typedef struct _request_packet {
 
 int file_exists(char *filename) { return (access(filename, 0) == 0); }
 
+void sig_chld(int signo)
+{
+	pid_t pid;
+	int stat;
+
+	while ((pid = waitpid(-1, &stat, WNOHANG)) > 0)
+		printf("child %d terminated\n", pid);
+
+	return;
+}
+
 void print_parse_request_result(req_pack *rp, header headers[],
 				int headers_size)
 {
@@ -342,6 +353,7 @@ void handle_request(int cli_fd)
 
 int startup()
 {
+	signal(SIGCHLD, sig_chld);
 	int server_fd = -1;
 
 	u_short port = PORT;
@@ -413,7 +425,6 @@ int main()
 
 			handle_request(client_fd);
 
-			close(client_fd);
 			exit(0);
 		} else {
 			close(client_fd);
