@@ -18,3 +18,5 @@ Make a http server.Just for learning.
 7、GET请求，文件存在时返回请求文件
 
 8、使用fork实现高并发的请求
+
+9、增加信号处理，防止僵尸进程产生
