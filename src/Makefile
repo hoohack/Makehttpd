@@ -3,16 +3,18 @@ client_obj = client.o
 
 CFLAGS = -g
 
+LIBS = -lpthread #-lsocket
+
 CC = gcc
 
 server: $(server_obj)
-	$(CC) $(server_obj) -o server
+	$(CC) $(server_obj) $(LIBS)-o server
 
 server.o: server.c
-	$(CC) -g -c server.c
+	$(CC) $(CFLAGS) -c server.c
 
 client: $(client_obj)
-	$(CC) -g -o client $(client_obj)
+	$(CC) $(CFLAGS) -o client $(client_obj)
 
 client.o: client.c
 	$(CC) -c client.c

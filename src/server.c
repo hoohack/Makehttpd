@@ -100,6 +100,8 @@ void bad_request(int sockfd)
 	send(sockfd, buf, strlen(buf), 0);
 	strcpy(buf, err_400);
 	send(sockfd, buf, strlen(err_400), 0);
+
+	close(sockfd);
 }
 
 void not_found(int sockfd, char *filename)
@@ -126,6 +128,8 @@ void not_found(int sockfd, char *filename)
 	send(sockfd, buf, strlen(buf), 0);
 	strcpy(buf, err_404);
 	send(sockfd, buf, strlen(err_404), 0);
+
+	close(sockfd);
 }
 
 void success_header(int sockfd)
@@ -156,6 +160,7 @@ void send_file(int sockfd, char *filename)
 			fgets(buf, sizeof(buf), fp);
 		}
 	}
+	fclose(fp);
 }
 
 void process_get(int sockfd, req_pack *rp)
@@ -320,8 +325,13 @@ int parse_request(int sockfd, char *recv_buf, req_pack *rp, header headers[])
 	return OK;
 }
 
-void handle_request(int cli_fd)
+void handle_request(void *arg)
 {
+	int cli_fd = *(int *)arg;
+	free(arg);
+
+	/*printf("client socket fd: %d\n", cli_fd);*/
+
 	char buf[BUFF_SIZE];
 	int req_len = 0;
 	int recv_len = 0;
@@ -364,6 +374,8 @@ void handle_request(int cli_fd)
 	} else {
 		process_get(cli_fd, rp);
 	}
+
+	close(cli_fd);
 }
 
 int startup()
@@ -405,10 +417,9 @@ int startup()
 
 int main()
 {
-	signal(SIGCHLD, sig_chld);
 	/* 定义server和client的文件描述符 */
 	int server_fd = -1;
-	int client_fd = -1;
+	/*int client_fd = -1;*/
 	struct sockaddr_in client_addr;
 	char recv_buf[BUFF_SIZE];
 
@@ -416,35 +427,29 @@ int main()
 	socklen_t client_addr_len = sizeof(client_addr);
 	server_fd = startup();
 
-	pid_t pid;
+	int err = 0;
+	pthread_t t_id;
 
 	while (1) {
 		/* 调用了accept函数，阻塞了进程，直到接收到客户端的请求 */
-		client_fd = accept(server_fd, (struct sockaddr *)&client_addr,
-				   &client_addr_len);
+		int *client_fd = (int *)malloc(sizeof(int));
+
+		*client_fd = accept(server_fd, (struct sockaddr *)&client_addr,
+				    &client_addr_len);
 		if (client_fd < 0) {
 			perror("accept");
 			exit(-1);
 		}
 
-		pid = fork();
-
-		if (pid < 0) {
-			perror("fork");
-			exit(-1);
-		}
-
-		if (pid == 0) {
-			close(server_fd);
-			printf("client socket fd: %d\n", client_fd);
-
-			handle_request(client_fd);
-
-			exit(0);
-		} else {
-			close(client_fd);
+		err = pthread_create(&t_id, NULL, (void *)handle_request,
+				     (void *)client_fd);
+		if (err != 0) {
+			perror("thread create");
 		}
 	}
+
+	printf("error\n");
+	close(server_fd);
 
 	return 0;
 }
