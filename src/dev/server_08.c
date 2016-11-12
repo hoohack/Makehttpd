@@ -1,3 +1,5 @@
+/* server version 8: 增加200 OK header */
+
 #include <ctype.h>
 #include <netinet/in.h>
 #include <stdbool.h>
