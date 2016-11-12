@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <netinet/in.h>
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -367,7 +368,6 @@ void handle_request(int cli_fd)
 
 int startup()
 {
-	signal(SIGCHLD, sig_chld);
 	int server_fd = -1;
 
 	u_short port = PORT;
@@ -405,6 +405,7 @@ int startup()
 
 int main()
 {
+	signal(SIGCHLD, sig_chld);
 	/* 定义server和client的文件描述符 */
 	int server_fd = -1;
 	int client_fd = -1;
