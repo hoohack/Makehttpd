@@ -20,3 +20,7 @@ Make a http server.Just for learning.
 8、使用fork实现高并发的请求
 
 9、增加信号处理，防止僵尸进程产生
+
+10、增加200 OK的响应头
+
+11、使用多线程实现并发
