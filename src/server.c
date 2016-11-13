@@ -330,7 +330,7 @@ void handle_request(void *arg)
 	int cli_fd = *(int *)arg;
 	free(arg);
 
-	/*printf("client socket fd: %d\n", cli_fd);*/
+	printf("client socket fd: %d\n", cli_fd);
 
 	char buf[BUFF_SIZE];
 	int req_len = 0;
@@ -375,6 +375,7 @@ void handle_request(void *arg)
 		process_get(cli_fd, rp);
 	}
 
+	free(rp);
 	close(cli_fd);
 }
 
@@ -446,6 +447,8 @@ int main()
 		if (err != 0) {
 			perror("thread create");
 		}
+		pthread_detach(t_id);
+		continue;
 	}
 
 	printf("error\n");
