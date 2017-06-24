@@ -333,7 +333,6 @@ int parse_request(int sockfd, char *recv_buf, req_pack *rp, header headers[])
 void handle_request(void *arg)
 {
 	int cli_fd = *(int *)arg;
-    /* 释放，防止内存泄漏 */
 	free(arg);
     arg = NULL;
 
