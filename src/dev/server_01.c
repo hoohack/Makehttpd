@@ -1,4 +1,4 @@
-/* server version 1: 简易server */
+/* server version 1: 阻塞型server */
 
 #include <ctype.h>
 #include <netinet/in.h>
@@ -26,7 +26,7 @@ int main()
 	char recv_buf[BUFF_SIZE];
 	char hello_str[] = "Hello world!";
 	int hello_len = 0;
-	server_sockfd = socket(PF_INET, SOCK_STREAM, 0);
+	server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (server_sockfd == -1) {
 		perror("socket");
 		exit(-1);

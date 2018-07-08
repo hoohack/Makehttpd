@@ -119,8 +119,8 @@ void not_found(int sockfd, char *filename)
 	send(sockfd, buf, strlen(err_404), 0);
 
 	close(sockfd);
-    free(err_404);
-    err_404 = NULL;
+	free(err_404);
+	err_404 = NULL;
 }
 
 void success_header(int sockfd)
@@ -246,12 +246,12 @@ int parse_start_line(int sockfd, char *recv_buf, req_pack *rp)
 	rp->url = url_str;
 	rp->version = ver_str;
 
-    free(method_str);
-    free(url_str);
-    free(ver_str);
-    method_str = NULL;
-    url_str = NULL;
-    ver_str = NULL;
+	free(method_str);
+	free(url_str);
+	free(ver_str);
+	method_str = NULL;
+	url_str = NULL;
+	ver_str = NULL;
 
 	return (i + 2);
 }
@@ -307,12 +307,12 @@ int parse_header(int sockfd, char *recv_buf, header headers[])
 		h_i++;
 	}
 
-    free(tmp_header);
-    free(key_str);
-    free(value_str);
-    tmp_header = NULL;
-    key_str = NULL;
-    value_str = NULL;
+	free(tmp_header);
+	free(key_str);
+	free(value_str);
+	tmp_header = NULL;
+	key_str = NULL;
+	value_str = NULL;
 
 	return (i + 2);
 }
@@ -334,7 +334,7 @@ void handle_request(void *arg)
 {
 	int cli_fd = *(int *)arg;
 	free(arg);
-    arg = NULL;
+	arg = NULL;
 
 	printf("client socket fd: %d\n", cli_fd);
 
@@ -382,7 +382,7 @@ void handle_request(void *arg)
 	}
 
 	free(rp);
-    rp = NULL;
+	rp = NULL;
 
 	close(cli_fd);
 }
@@ -405,6 +405,13 @@ int startup()
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(PORT);
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	int on = 1;
+	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) <
+	    0) {
+		perror("setsockopt");
+		exit(-1);
+	}
 
 	/* 把套接字地址结构绑定到套接字 */
 	if (bind(server_fd, (struct sockaddr *)&server_addr,

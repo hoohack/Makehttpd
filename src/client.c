@@ -1,13 +1,13 @@
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <stdio.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
 #include <fcntl.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/shm.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define MYPORT 9001
 #define BUFFER_SIZE 1024
@@ -33,7 +33,10 @@ int main()
 
 	char sendbuf[BUFFER_SIZE];
 	char recvbuf[BUFFER_SIZE];
-	while (fgets(sendbuf, sizeof(sendbuf), stdin) != NULL) {
+	do {
+		if (fgets(sendbuf, sizeof(sendbuf), stdin) == NULL) {
+			break;
+		}
 		send(sock_cli, sendbuf, strlen(sendbuf), 0); ///发送
 		if (strcmp(sendbuf, "exit\n") == 0)
 			break;
@@ -42,8 +45,7 @@ int main()
 
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(recvbuf, 0, sizeof(recvbuf));
-	}
-
+	} while (0);
 	close(sock_cli);
 	return 0;
 }
